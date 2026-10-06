@@ -1,89 +1,54 @@
 <script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from './assets/vite.svg'
-  import heroImg from './assets/hero.png'
-  import Counter from './lib/Counter.svelte'
+  import { onMount } from 'svelte';
+  import { api } from './lib/api.js';
+  import { auth } from './lib/auth.svelte.js';
+  import Login from './pages/Login.svelte';
+  import Tareas from './pages/Tareas.svelte';
+
+  // La ruta actual: lo que está después del # en la URL
+  let ruta = $state(leerRuta());
+
+  function leerRuta() {
+    return location.hash.slice(1) || '/';
+  }
+
+  // Al abrir la app, preguntamos al backend si ya hay una sesión activa
+  onMount(async () => {
+    try {
+      auth.usuario = await api('/auth/me');
+    } catch {
+      auth.usuario = null;
+    } finally {
+      auth.cargando = false;
+    }
+  });
+
+  // GUARDIA: se vuelve a ejecutar cada vez que cambia la ruta o la sesión
+  $effect(() => {
+    if (auth.cargando) return;
+
+    if (!auth.usuario && ruta !== '/login') {
+      location.hash = '#/login';   // sin sesión → al login
+    } else if (auth.usuario && ruta !== '/tareas') {
+      location.hash = '#/tareas';  // con sesión → a sus tareas
+    }
+  });
 </script>
 
-<section id="center">
-  <div class="hero">
-    <img src={heroImg} class="base" width="170" height="179" alt="" />
-    <img src={svelteLogo} class="framework" alt="Svelte logo" />
-    <img src={viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/App.svelte</code> and save to test <code>HMR</code></p>
-  </div>
-  <Counter />
-</section>
+<!-- Escucha cuando cambia el # de la URL -->
+<svelte:window onhashchange={() => (ruta = leerRuta())} />
 
-<div class="ticks"></div>
+{#if auth.cargando}
+  <p class="cargando">Cargando...</p>
+{:else if ruta === '/login' && !auth.usuario}
+  <Login />
+{:else if ruta === '/tareas' && auth.usuario}
+  <Tareas />
+{/if}
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#documentation-icon"></use>
-    </svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-          <img class="logo" src={viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://svelte.dev/" target="_blank" rel="noreferrer">
-          <img class="button-icon" src={svelteLogo} alt="" />
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#social-icon"></use>
-    </svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li>
-        <a href="https://github.com/vitejs/vite" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#github-icon"></use>
-          </svg>
-          GitHub
-        </a>
-      </li>
-      <li>
-        <a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#discord-icon"></use>
-          </svg>
-          Discord
-        </a>
-      </li>
-      <li>
-        <a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#x-icon"></use>
-          </svg>
-          X.com
-        </a>
-      </li>
-      <li>
-        <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#bluesky-icon"></use>
-          </svg>
-          Bluesky
-        </a>
-      </li>
-    </ul>
-  </div>
-</section>
-
-<div class="ticks"></div>
-<section id="spacer"></section>
+<style>
+  .cargando {
+    text-align: center;
+    margin-top: 40vh;
+  }
+</style>
