@@ -1,23 +1,19 @@
-// 1. Traemos la librería Express
 import express from 'express';
+import tareaRoutes from './routes/tareaRoutes.js';
 
-// 2. Creamos la aplicación (nuestro servidor)
 const app = express();
-
-// 3. El "puerto" es como el número de puerta por donde entran las peticiones
 const PUERTO = 3000;
 
-// 4. Una RUTA: cuando alguien visite "/", respondemos con un texto
+// Permite leer datos en formato JSON que llegan en req.body
+app.use(express.json());
+
 app.get('/', (req, res) => {
-  res.send('¡Hola! Mi servidor funciona jeje');
+  res.send('API de Tasky funcionando 🚀');
 });
 
-// 5. Otra ruta, pero esta responde en formato JSON (así hablan las APIs)
-app.get('/api/saludo', (req, res) => {
-  res.json({ mensaje: 'Hola desde la API', app: 'TareaRacha' });
-});
+// Todas las rutas de tareas empiezan con /api/tareas
+app.use('/api/tareas', tareaRoutes);
 
-// 6. Encendemos el servidor y lo ponemos a escuchar en el puerto 3000
 app.listen(PUERTO, () => {
   console.log(`Servidor escuchando en http://localhost:${PUERTO}`);
 });
