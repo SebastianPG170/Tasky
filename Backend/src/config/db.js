@@ -1,5 +1,5 @@
 import { DatabaseSync } from 'node:sqlite';
-import { createHash } from 'node:crypto';
+import { md5 } from '../utils/hash.js';
 
 // 1. Abre (o crea, si no existe) el archivo de la base de datos
 const db = new DatabaseSync('tasky.db');
@@ -28,7 +28,7 @@ db.exec(`
 // 3. Crea un usuario de prueba si no existe (contraseña guardada en MD5)
 const existe = db.prepare('SELECT id FROM usuarios WHERE username = ?').get('demo');
 if (!existe) {
-  const passwordMd5 = createHash('md5').update('demo123').digest('hex');
+const passwordMd5 = md5('demo123');
   db.prepare('INSERT INTO usuarios (username, password) VALUES (?, ?)').run('demo', passwordMd5);
 }
 

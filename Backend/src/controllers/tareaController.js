@@ -1,8 +1,6 @@
 import * as Tarea from '../models/tareaModel.js';
 
-// TEMPORAL: mientras no hay login, todo se hace como el usuario 1 (demo).
-// Cuando hagamos el login, esto vendrá de la sesión.
-const USUARIO_TEMPORAL = 1;
+
 
 const PRIORIDADES = ['baja', 'media', 'alta'];
 const ESTADOS = ['pendiente', 'entregada'];
@@ -13,7 +11,7 @@ function hoy() {
 }
 // GET /api/tareas
 export function listar(req, res) {
-  const tareas = Tarea.listarPorUsuario(USUARIO_TEMPORAL);
+  const tareas = Tarea.listarPorUsuario(req.session.usuarioId);
   res.json(tareas);
 }
 
@@ -29,13 +27,13 @@ export function crear(req, res) {
     return res.status(400).json({ error: 'prioridad debe ser baja, media o alta' });
   }
 
-  const nueva = Tarea.crear(USUARIO_TEMPORAL, { materia, titulo, fecha_entrega, prioridad });
+  const nueva = Tarea.crear(req.session.usuarioId, { materia, titulo, fecha_entrega, prioridad });
   res.status(201).json(nueva);
 }
 // PUT /api/tareas/:id
 export function actualizar(req, res) {
   const id = Number(req.params.id);
-  const actual = Tarea.buscarPorId(USUARIO_TEMPORAL, id);
+  const actual = Tarea.buscarPorId(req.session.usuarioId, id);
 
   if (!actual) {
     return res.status(404).json({ error: 'Tarea no encontrada' });
@@ -68,14 +66,14 @@ export function actualizar(req, res) {
     tarea.fecha_completada = null;
   }
 
-  const actualizada = Tarea.actualizar(USUARIO_TEMPORAL, id, tarea);
+  const actualizada = Tarea.actualizar(req.session.usuarioId, id, tarea);
   res.json(actualizada);
 }
 
 // DELETE /api/tareas/:id
 export function eliminar(req, res) {
   const id = Number(req.params.id);
-  const borrada = Tarea.eliminar(USUARIO_TEMPORAL, id);
+  const borrada = Tarea.eliminar(req.session.usuarioId, id);
 
   if (!borrada) {
     return res.status(404).json({ error: 'Tarea no encontrada' });
