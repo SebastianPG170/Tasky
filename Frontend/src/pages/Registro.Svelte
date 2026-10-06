@@ -2,25 +2,31 @@
   import { api } from '../lib/api.js';
   import { auth } from '../lib/auth.svelte.js';
 
-  // Estado del formulario
   let username = $state('');
   let password = $state('');
+  let confirmacion = $state('');
   let error = $state('');
   let enviando = $state(false);
 
-  async function iniciarSesion(evento) {
-    evento.preventDefault(); // evita que el navegador recargue la página
+  async function crearCuenta(evento) {
+    evento.preventDefault();
     error = '';
-    enviando = true;
 
+    // Esta validación es del frontend: evita una petición inútil
+    if (password !== confirmacion) {
+      error = 'Las contraseñas no coinciden';
+      return;
+    }
+
+    enviando = true;
     try {
-      auth.usuario = await api('/auth/login', {
+      auth.usuario = await api('/auth/registro', {
         method: 'POST',
         body: { username, password },
       });
       location.hash = '#/tareas';
     } catch (e) {
-      error = e.message; // "Usuario o contraseña incorrectos"
+      error = e.message;
     } finally {
       enviando = false;
     }
@@ -28,18 +34,23 @@
 </script>
 
 <main class="contenedor-login">
-  <form class="tarjeta" onsubmit={iniciarSesion}>
+  <form class="tarjeta" onsubmit={crearCuenta}>
     <h1>📚 Tasky</h1>
-    <p class="subtitulo">Tus deberes, tu racha.</p>
+    <p class="subtitulo">Crea tu cuenta y empieza tu racha.</p>
 
     <label>
       Usuario
-      <input bind:value={username} autocomplete="username" required />
+      <input bind:value={username} autocomplete="username" placeholder="juan_perez" required />
     </label>
 
     <label>
       Contraseña
-      <input type="password" bind:value={password} autocomplete="current-password" required />
+      <input type="password" bind:value={password} autocomplete="new-password" minlength="6" required />
+    </label>
+
+    <label>
+      Repite la contraseña
+      <input type="password" bind:value={confirmacion} autocomplete="new-password" required />
     </label>
 
     {#if error}
@@ -47,9 +58,10 @@
     {/if}
 
     <button type="submit" disabled={enviando}>
-      {enviando ? 'Entrando...' : 'Iniciar sesión'}
+      {enviando ? 'Creando cuenta...' : 'Crear cuenta'}
     </button>
-    <p class="cambiar">¿No tienes cuenta? <a href="#/registro">Créala aquí</a></p>
+
+    <p class="cambiar">¿Ya tienes cuenta? <a href="#/login">Inicia sesión</a></p>
   </form>
 </main>
 
@@ -71,14 +83,9 @@
     margin: 0;
     text-align: center;
   }
-  .subtitulo{
-    margin: -8px 0 8px;
+  .subtitulo, .cambiar {
+    margin: 0;
     text-align: center;
     color: var(--texto-suave);
   }
-  .cambiar {
-    margin:  0 ;
-    text-align: center;
-    color: var(--texto-suave);
-    }
 </style>
