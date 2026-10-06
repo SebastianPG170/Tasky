@@ -2,18 +2,24 @@
   import { onMount } from 'svelte';
   import { api } from './lib/api.js';
   import { auth } from './lib/auth.svelte.js';
+  import { datos, cargarTareas, limpiarTareas } from './lib/tareas.svelte.js';
   import Login from './pages/Login.svelte';
-  import Tareas from './pages/Tareas.svelte';
   import Registro from './pages/Registro.svelte';
+  import Encabezado from './components/Encabezado.svelte';
+  import Tareas from './pages/Tareas.svelte';
+  import Entregadas from './pages/Entregadas.svelte';
+  import Progreso from './pages/Progreso.svelte';
 
-  // La ruta actual: lo que está después del # en la URL
+  const RUTAS_PUBLICAS = ['/login', '/registro'];
+  const RUTAS_PRIVADAS = ['/tareas', '/entregadas', '/progreso'];
+
   let ruta = $state(leerRuta());
 
   function leerRuta() {
     return location.hash.slice(1) || '/';
   }
 
-  // Al abrir la app, preguntamos al backend si ya hay una sesión activa
+  // Al abrir la app: ¿ya hay una sesión activa?
   onMount(async () => {
     try {
       auth.usuario = await api('/auth/me');
@@ -23,37 +29,62 @@
       auth.cargando = false;
     }
   });
-  // Rutas que se pueden ver SIN sesión
-  const RUTAS_PUBLICAS = ['/login', '/registro'];
 
-  // GUARDIA: se vuelve a ejecutar cada vez que cambia la ruta o la sesión
+  // GUARDIA: cada quien a donde le corresponde
   $effect(() => {
     if (auth.cargando) return;
 
     if (!auth.usuario && !RUTAS_PUBLICAS.includes(ruta)) {
-      location.hash = '#/login';   // sin sesión → al login
-    } else if (auth.usuario && ruta !== '/tareas') {
-      location.hash = '#/tareas';  // con sesión → a sus tareas
+      location.hash = '#/login';
+    } else if (auth.usuario && !RUTAS_PRIVADAS.includes(ruta)) {
+      location.hash = '#/tareas';
+    }
+  });
+
+  // Carga las tareas cuando alguien entra; las borra de memoria cuando sale
+  $effect(() => {
+    if (auth.usuario) {
+      cargarTareas();
+    } else {
+      limpiarTareas();
     }
   });
 </script>
 
-<!-- Escucha cuando cambia el # de la URL -->
 <svelte:window onhashchange={() => (ruta = leerRuta())} />
 
 {#if auth.cargando}
-  <p class="cargando">Cargando...</p>
-{:else if ruta === '/login' && !auth.usuario}
-  <Login />
-{:else if ruta === '/registro' && !auth.usuario}
-  <Registro />
-{:else if ruta === '/tareas' && auth.usuario}
-  <Tareas />
+  <p class="cargando">Abriendo tu cuaderno…</p>
+{:else if !auth.usuario}
+  {#if ruta === '/registro'}
+    <Registro />
+  {:else}
+    <Login />
+  {/if}
+{:else}
+  <div class="pagina">
+    <Encabezado {ruta} />
+    <main>
+      {#if ruta === '/entregadas'}
+        <Entregadas />
+      {:else if ruta === '/progreso'}
+        <Progreso />
+      {:else}
+        <Tareas />
+      {/if}
+    </main>
+  </div>
+{/if}
+
+{#if datos.mensaje}
+  <div class="nota" role="status">{datos.mensaje}</div>
 {/if}
 
 <style>
   .cargando {
-    text-align: center;
     margin-top: 40vh;
+    text-align: center;
+    font-family: var(--mano);
+    font-size: 2rem;
   }
 </style>

@@ -10,13 +10,14 @@ export function diasHasta(fecha) {
   return Math.round((objetivo - actual) / 86400000); // 86 400 000 ms = 1 día
 }
 
-// Texto amigable para mostrar en cada tarea
+
+// Texto para el margen de cada tarea
 export function textoVencimiento(fecha) {
   const dias = diasHasta(fecha);
-  if (dias === 0) return '⏰ Vence hoy';
-  if (dias === 1) return '📅 Vence mañana';
-  if (dias > 1) return `📅 Faltan ${dias} días`;
-  return `⚠️ Atrasada ${-dias} día${dias === -1 ? '' : 's'}`;
+  if (dias === 0) return 'vence hoy';
+  if (dias === 1) return 'vence mañana';
+  if (dias > 1) return `faltan ${dias} días`;
+  return dias === -1 ? 'atrasada 1 día' : `atrasada ${-dias} días`;
 }
 
 // XP de una tarea: 20 si se entregó a tiempo, 5 si se entregó tarde
