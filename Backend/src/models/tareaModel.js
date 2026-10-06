@@ -24,4 +24,31 @@ export function crear(usuarioId, datos) {
     .run(usuarioId, datos.materia, datos.titulo, datos.fecha_entrega, datos.prioridad ?? 'media');
 
   return buscarPorId(usuarioId, resultado.lastInsertRowid);
+  
+}
+// ACTUALIZAR: cambia los datos de una tarea (solo si es del usuario)
+export function actualizar(usuarioId, id, datos) {
+  const resultado = db
+    .prepare(`
+      UPDATE tareas
+      SET materia = ?, titulo = ?, fecha_entrega = ?, prioridad = ?, estado = ?, fecha_completada = ?
+      WHERE id = ? AND usuario_id = ?
+    `)
+    .run(
+      datos.materia, datos.titulo, datos.fecha_entrega,
+      datos.prioridad, datos.estado, datos.fecha_completada,
+      id, usuarioId
+    );
+
+  if (resultado.changes === 0) return undefined; // no existía
+  return buscarPorId(usuarioId, id);
+}
+
+// ELIMINAR: borra una tarea. Devuelve true si borró algo
+export function eliminar(usuarioId, id) {
+  const resultado = db
+    .prepare('DELETE FROM tareas WHERE id = ? AND usuario_id = ?')
+    .run(id, usuarioId);
+
+  return resultado.changes > 0;
 }
