@@ -1,7 +1,7 @@
 import * as Usuario from '../models/usuarioModel.js';
 import { md5 } from '../utils/hash.js';
 
-// Crea la sesión y responde con los datos del usuario (lo usan login y registro)
+// regenerate() asigna un id de sesión nuevo al autenticarse para evitar la fijación de sesión
 function iniciarSesion(req, res, usuario, codigo = 200) {
   req.session.regenerate((err) => {
     if (err) return res.status(500).json({ error: 'No se pudo iniciar sesión' });

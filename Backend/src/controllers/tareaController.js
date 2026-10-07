@@ -5,7 +5,7 @@ import * as Tarea from '../models/tareaModel.js';
 const PRIORIDADES = ['baja', 'media', 'alta'];
 const ESTADOS = ['pendiente', 'entregada'];
 
-// Fecha de hoy en formato AAAA-MM-DD, usando la hora de Ecuador (no la de Londres)
+// 'en-CA' da AAAA-MM-DD en hora local; toISOString() usa UTC y de noche devolvería el día siguiente
 function hoy() {
   return new Date().toLocaleDateString('en-CA');
 }
@@ -19,7 +19,6 @@ export function listar(req, res) {
 export function crear(req, res) {
   const { materia, titulo, fecha_entrega, prioridad } = req.body ?? {};
 
-  // Validaciones: el controlador revisa que el pedido tenga sentido
   if (!materia || !titulo || !fecha_entrega) {
     return res.status(400).json({ error: 'materia, titulo y fecha_entrega son obligatorios' });
   }
@@ -59,7 +58,7 @@ export function actualizar(req, res) {
     return res.status(400).json({ error: 'estado debe ser pendiente o entregada' });
   }
 
-  // Para XP y racha: guardamos el día en que se entregó
+  // fecha_completada alimenta XP y racha; si ya estaba entregada se conserva la fecha original
   if (tarea.estado === 'entregada') {
     tarea.fecha_completada = actual.fecha_completada ?? hoy();
   } else {

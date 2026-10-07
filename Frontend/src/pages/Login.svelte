@@ -2,14 +2,13 @@
   import { api } from '../lib/api.js';
   import { auth } from '../lib/auth.svelte.js';
 
-  // Estado del formulario
   let username = $state('');
   let password = $state('');
   let error = $state('');
   let enviando = $state(false);
 
   async function iniciarSesion(evento) {
-    evento.preventDefault(); // evita que el navegador recargue la página
+    evento.preventDefault();
     error = '';
     enviando = true;
 
@@ -20,7 +19,7 @@
       });
       location.hash = '#/tareas';
     } catch (e) {
-      error = e.message; // "Usuario o contraseña incorrectos"
+      error = e.message;
     } finally {
       enviando = false;
     }

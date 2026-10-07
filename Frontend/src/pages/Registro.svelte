@@ -12,7 +12,7 @@
     evento.preventDefault();
     error = '';
 
-    // Esta validación es del frontend: evita una petición inútil
+    // Validación solo de frontend: la confirmación no se envía al backend
     if (password !== confirmacion) {
       error = 'Las contraseñas no coinciden';
       return;

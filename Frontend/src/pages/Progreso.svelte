@@ -80,7 +80,7 @@
     border-radius: 50% 45% 55% 48% / 55% 50% 48% 52%;
     transform: rotate(-4deg);
   }
-    /* Centrado óptico: la letra Caveat dibuja los números corridos a la derecha y abajo */
+  /* Centrado óptico: Caveat dibuja los números desplazados hacia la derecha y abajo */
   .cifra {
     transform: translate(-0.1em, -0.05em);
   }

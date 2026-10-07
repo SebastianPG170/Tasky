@@ -8,7 +8,6 @@ export const datos = $state({
   mensaje: '', // texto del post-it
 });
 
-// LEER
 export async function cargarTareas() {
   try {
     datos.tareas = await api('/tareas');
@@ -19,27 +18,25 @@ export async function cargarTareas() {
   }
 }
 
-// Al cerrar sesión: que el siguiente usuario no vea las tareas del anterior
+// Se llama al cerrar sesión para que el siguiente usuario no vea las tareas del anterior
 export function limpiarTareas() {
   datos.tareas = [];
   datos.cargando = true;
 }
 
-// CREAR (si falla, el error llega al formulario que la llamó)
+// Sin try/catch: si falla, el error se propaga al formulario que la llamó
 export async function crearTarea(form) {
   await api('/tareas', { method: 'POST', body: form });
   avisar('Tarea agregada');
   await cargarTareas();
 }
 
-// ACTUALIZAR
 export async function editarTarea(id, form) {
   await api(`/tareas/${id}`, { method: 'PUT', body: form });
   avisar('Cambios guardados');
   await cargarTareas();
 }
 
-// ACTUALIZAR el estado: pendiente ↔ entregada
 export async function alternarEstado(tarea) {
   const estado = tarea.estado === 'pendiente' ? 'entregada' : 'pendiente';
   try {
@@ -53,7 +50,6 @@ export async function alternarEstado(tarea) {
   }
 }
 
-// ELIMINAR
 export async function eliminarTarea(tarea) {
   if (!confirm(`¿Borrar "${tarea.titulo}"? No se puede deshacer.`)) return;
   try {

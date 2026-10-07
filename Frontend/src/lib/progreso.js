@@ -1,4 +1,4 @@
-// Fecha de hoy en formato AAAA-MM-DD (hora local de Ecuador)
+// 'en-CA' da AAAA-MM-DD en hora local; toISOString() usa UTC y de noche devolvería el día siguiente
 export function hoy() {
   return new Date().toLocaleDateString('en-CA');
 }
@@ -26,7 +26,6 @@ export function xpDeTarea(tarea) {
   return tarea.fecha_completada <= tarea.fecha_entrega ? 20 : 5;
 }
 
-// XP total: suma los XP de todas las tareas
 export function calcularXP(tareas) {
   return tareas.reduce((total, tarea) => total + xpDeTarea(tarea), 0);
 }
@@ -46,7 +45,7 @@ export function calcularRacha(tareas) {
   let racha = 0;
   while (diasConEntrega.has(fecha.toLocaleDateString('en-CA'))) {
     racha++;
-    fecha.setDate(fecha.getDate() - 1); // retrocede un día
+    fecha.setDate(fecha.getDate() - 1);
   }
   return racha;
 }

@@ -19,7 +19,7 @@
     return location.hash.slice(1) || '/';
   }
 
-  // Al abrir la app: ¿ya hay una sesión activa?
+  // Al cargar la app, recupera la sesión si la cookie sigue vigente
   onMount(async () => {
     try {
       auth.usuario = await api('/auth/me');
@@ -30,7 +30,7 @@
     }
   });
 
-  // GUARDIA: cada quien a donde le corresponde
+  // Guardia de navegación: solo mejora la experiencia; la protección real está en el backend (requireAuth)
   $effect(() => {
     if (auth.cargando) return;
 

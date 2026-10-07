@@ -1,20 +1,18 @@
 import db from '../config/db.js';
 
-// LEER: todas las tareas de un usuario, ordenadas por fecha de entrega
 export function listarPorUsuario(usuarioId) {
   return db
     .prepare('SELECT * FROM tareas WHERE usuario_id = ? ORDER BY fecha_entrega')
     .all(usuarioId);
 }
 
-// LEER: una sola tarea (solo si pertenece a ese usuario)
+// Filtra por usuario_id para que nadie acceda a tareas ajenas
 export function buscarPorId(usuarioId, id) {
   return db
     .prepare('SELECT * FROM tareas WHERE id = ? AND usuario_id = ?')
     .get(id, usuarioId);
 }
 
-// CREAR: inserta una tarea nueva y la devuelve completa
 export function crear(usuarioId, datos) {
   const resultado = db
     .prepare(`
@@ -26,7 +24,6 @@ export function crear(usuarioId, datos) {
   return buscarPorId(usuarioId, resultado.lastInsertRowid);
   
 }
-// ACTUALIZAR: cambia los datos de una tarea (solo si es del usuario)
 export function actualizar(usuarioId, id, datos) {
   const resultado = db
     .prepare(`
@@ -40,11 +37,10 @@ export function actualizar(usuarioId, id, datos) {
       id, usuarioId
     );
 
-  if (resultado.changes === 0) return undefined; // no existía
+  if (resultado.changes === 0) return undefined; // no existe o es de otro usuario
   return buscarPorId(usuarioId, id);
 }
 
-// ELIMINAR: borra una tarea. Devuelve true si borró algo
 export function eliminar(usuarioId, id) {
   const resultado = db
     .prepare('DELETE FROM tareas WHERE id = ? AND usuario_id = ?')

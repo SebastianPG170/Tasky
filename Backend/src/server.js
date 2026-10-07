@@ -9,7 +9,6 @@ const PUERTO = 3000;
 
 app.use(express.json());
 
-// Configuración de sesiones
 app.use(session({
   secret: process.env.SESSION_SECRET,  // firma la cookie (viene del .env)
   resave: false,                       // no guardar la sesión si no cambió
@@ -25,10 +24,10 @@ app.get('/', (req, res) => {
   res.send('API de Tasky funcionando 🚀');
 });
 
-// Rutas públicas: cualquiera puede intentar iniciar sesión
+// Rutas públicas: no requieren sesión
 app.use('/api/auth', authRoutes);
 
-// Rutas protegidas: primero pasa por el guardia (requireAuth)
+// Rutas protegidas: requireAuth exige sesión antes de llegar al router
 app.use('/api/tareas', requireAuth, tareaRoutes);
 
 app.listen(PUERTO, () => {
