@@ -104,7 +104,7 @@ Tasky/
 1. Clona el repositorio:
 
 ```bash
-   git clone https://github.com/[tu-usuario]/tasky.git
+   git clone https://github.com/[SebastianPG170]/tasky.git
    cd tasky
 ```
 
@@ -155,7 +155,7 @@ node scripts/cambiar-password.js <usuario> <contraseña-nueva>
 - **Consultas parametrizadas** (`?`) para evitar inyección SQL.
 - **Validaciones** de datos en el backend, con mensajes de error claros.
 
-> **Nota sobre MD5:** se usa porque así lo pide el enunciado del deber. MD5 es rápido y no usa sal, por lo que contraseñas simples pueden descubrirse con tablas precalculadas. En un sistema real se usaría un algoritmo diseñado para contraseñas, como **bcrypt** o **Argon2**.
+
 
 ## Endpoints de la API
 
