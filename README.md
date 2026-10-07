@@ -42,7 +42,7 @@ Terminado. Prototipo funcional entregado como primer deber del curso.
 
 ## Demostración
 
-🎬 **Video:** [Ver demostración](ENLACE_DEL_VIDEO)
+🎬 **Video:** [Ver demostración](https://youtu.be/yIxMNLWcQr0)
 
 | Inicio de sesión | Tareas entregadas | Progreso |
 |---|---|---|
